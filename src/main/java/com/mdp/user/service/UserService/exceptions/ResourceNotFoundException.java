@@ -1,12 +1,12 @@
 package com.mdp.user.service.UserService.exceptions;
 
-public class ResourceNotFoundException extends RuntimeException{
+public class ResourceNotFoundException extends RuntimeException {
 
     public ResourceNotFoundException() {
         super("Resource not found on server!!");
     }
 
-    public ResourceNotFoundException(String message){
+    public ResourceNotFoundException(String message) {
         super(message);
     }
 }

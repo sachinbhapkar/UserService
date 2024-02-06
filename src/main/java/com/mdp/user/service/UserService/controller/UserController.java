@@ -18,14 +18,14 @@ public class UserController {
 
     //create
     @PostMapping
-    public ResponseEntity<User> createUser(@RequestBody User user){
+    public ResponseEntity<User> createUser(@RequestBody User user) {
         User user1 = userService.saveUser(user);
         return ResponseEntity.status(HttpStatus.CREATED).body(user1);
     }
 
     //get user
     @GetMapping("/{userId}")
-    public ResponseEntity<User> getUser(@PathVariable String userId){
+    public ResponseEntity<User> getUser(@PathVariable String userId) {
         User user = userService.getUser(userId);
         return ResponseEntity.status(HttpStatus.OK).body(user);
 
@@ -33,7 +33,7 @@ public class UserController {
 
     // get all user
     @GetMapping
-    public ResponseEntity<List<User>> getAllUsers(){
+    public ResponseEntity<List<User>> getAllUsers() {
         List<User> allUsers = userService.getAllUsers();
         return ResponseEntity.ok(allUsers);
     }
