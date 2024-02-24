@@ -1,20 +1,32 @@
 package com.mdp.user.service.UserService.services.impl;
 
-import com.mdp.user.service.UserService.exceptions.ResourceNotFoundException;
+import com.mdp.user.service.UserService.entities.Hotel;
+import com.mdp.user.service.UserService.entities.Rating;
 import com.mdp.user.service.UserService.entities.User;
+import com.mdp.user.service.UserService.exceptions.ResourceNotFoundException;
 import com.mdp.user.service.UserService.repositories.UserRepository;
 import com.mdp.user.service.UserService.services.UserService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.RestTemplate;
 
 import java.util.List;
+import java.util.Objects;
 import java.util.UUID;
 
 @Service
 public class UserServiceImpl implements UserService {
 
+    private Logger logger = LoggerFactory.getLogger(UserServiceImpl.class);
+
     @Autowired
     private UserRepository userRepository;
+
+    @Autowired
+    RestTemplate restTemplate;
 
     @Override
     public User saveUser(User user) {
@@ -30,6 +42,19 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public User getUser(String userId) {
-        return userRepository.findById(userId).orElseThrow(()-> new ResourceNotFoundException("User with given Id not found on server !! :"+ userId));
+
+        User user = userRepository.findById(userId).orElseThrow(() -> new ResourceNotFoundException("User with given Id not found on server !! :" + userId));
+        Rating[] ratingsListResponse = restTemplate.getForObject("http://RATING-SERVICE/ratings/users/" + userId, Rating[].class);
+        List<Rating> ratingsList = List.of(Objects.requireNonNull(ratingsListResponse));
+        ratingsList.forEach(
+                rating -> {
+                    ResponseEntity<Hotel> hotelResponseEntity = restTemplate.getForEntity("http://HOTEL-SERVICE/hotels/"+ rating.getHotelId(), Hotel.class);
+                    Hotel hotel = hotelResponseEntity.getBody();
+                    rating.setHotel(hotel);
+                }
+        );
+        user.setRatings(ratingsList);
+        logger.info("fetched rating {}", ratingsList);
+        return user;
     }
 }
