@@ -4,6 +4,7 @@ import com.mdp.user.service.UserService.entities.Hotel;
 import com.mdp.user.service.UserService.entities.Rating;
 import com.mdp.user.service.UserService.entities.User;
 import com.mdp.user.service.UserService.exceptions.ResourceNotFoundException;
+import com.mdp.user.service.UserService.externalservices.HotelService;
 import com.mdp.user.service.UserService.repositories.UserRepository;
 import com.mdp.user.service.UserService.services.UserService;
 import org.slf4j.Logger;
@@ -20,13 +21,16 @@ import java.util.UUID;
 @Service
 public class UserServiceImpl implements UserService {
 
-    private Logger logger = LoggerFactory.getLogger(UserServiceImpl.class);
+    private final Logger logger = LoggerFactory.getLogger(UserServiceImpl.class);
 
     @Autowired
     private UserRepository userRepository;
 
     @Autowired
     RestTemplate restTemplate;
+
+    @Autowired
+    HotelService hotelService;
 
     @Override
     public User saveUser(User user) {
@@ -48,8 +52,9 @@ public class UserServiceImpl implements UserService {
         List<Rating> ratingsList = List.of(Objects.requireNonNull(ratingsListResponse));
         ratingsList.forEach(
                 rating -> {
-                    ResponseEntity<Hotel> hotelResponseEntity = restTemplate.getForEntity("http://HOTEL-SERVICE/hotels/"+ rating.getHotelId(), Hotel.class);
-                    Hotel hotel = hotelResponseEntity.getBody();
+//                    ResponseEntity<Hotel> hotelResponseEntity = restTemplate.getForEntity("http://HOTEL-SERVICE/hotels/"+ rating.getHotelId(), Hotel.class);
+//                    Hotel hotel = hotelResponseEntity.getBody();
+                    Hotel hotel = hotelService.getHotel(rating.getHotelId());
                     rating.setHotel(hotel);
                 }
         );
