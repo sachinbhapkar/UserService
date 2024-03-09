@@ -10,7 +10,6 @@ import com.mdp.user.service.UserService.services.UserService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
@@ -48,7 +47,7 @@ public class UserServiceImpl implements UserService {
     public User getUser(String userId) {
 
         User user = userRepository.findById(userId).orElseThrow(() -> new ResourceNotFoundException("User with given Id not found on server !! :" + userId));
-        Rating[] ratingsListResponse = restTemplate.getForObject("http://RATING-SERVICE/ratings/users/" + userId, Rating[].class);
+        Rating[] ratingsListResponse = restTemplate.getForObject("http://RATINGS/ratings/users/" + userId, Rating[].class);
         List<Rating> ratingsList = List.of(Objects.requireNonNull(ratingsListResponse));
         ratingsList.forEach(
                 rating -> {
